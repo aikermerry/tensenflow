@@ -58,6 +58,12 @@ print(sess.run(softmax_xentropy))
 #稀疏Softmax交叉熵损失函数
 
 unscaled_logits = tf.constant([1.,-3.,10.])
-sparse_target_dist = tf.constant([2])
+sparse_ta
+
+
+
+
+
+rget_dist = tf.constant([2])
 sparse_xentropy = tf.nn.sparse_softmax_cross_entropy_with_logits(unscaled_logits,sparse_target_dist)
 print(sess.run(sparse_xentropy))
