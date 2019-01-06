@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import forward
 import generateds
 
-STEPS = 400000
+STEPS = 40000
 BATCH_SIZE = 30
 LEARNING_RATE_BASE=0.001
 LEARNING_RATE_DECAY=0.99
@@ -20,7 +20,7 @@ def backward():
     x = tf.placeholder(tf.float32,shape=(None,2))
     y_ = tf.placeholder(tf.float32,shape=(None,1))
 
-    y = forward.forward(x,regularizer)
+    y,w1,w2 = forward.forward(x,regularizer)
     global_step = tf.Variable(0,trainable=False)
 #定义损失函数
     loss_mse = tf.reduce_mean(tf.square(y-y_))
@@ -58,7 +58,9 @@ def backward():
 
             if i%2000 ==0 :
                 loss_v=sess.run(loss_total,feed_dict={x:X,y_:Y_})
-                print(i,loss_v)
+
+                print("steps:"+str(i)+" 损失："+str(loss_v))
+                print("w1:"+str(sess.run(w1,feed_dict={x:X})))
               
 
         xx,yy = np.mgrid[-3:3:0.01,-3:3:0.01]

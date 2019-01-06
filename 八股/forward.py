@@ -9,7 +9,7 @@ def forward(x,regularizer):
     w2 = get_weight([11,1],regularizer)
     b2 = get_bias([1])
     y = tf.matmul(y1,w2)+b2
-    return y
+    return y ,w1, w2
 
 def get_weight(shape,regularizer):
     w = tf.Variable(tf.random_normal(shape),dtype = tf.float32)

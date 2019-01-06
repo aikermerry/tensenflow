@@ -3,7 +3,7 @@
 1. 导入数据：
 
    ```
-   from tensorflow.example.tutorials.mnist import input_data
+   from tensorflow.examples.tutorials.mnist import input_data
    mnist = input_data.read_data_sets('./data/',one_hot =True)
    
    如果没找到将会在这些地方去发现
