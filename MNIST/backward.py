@@ -8,8 +8,8 @@ import os
 
 STEPS = 40000
 BATCH_SIZE = 200
-LEARNING_RATE_BASE=0.1
-LEARNING_RATE_DECAY=0.99
+LEARNING_RATE_BASE=0.001
+LEARNING_RATE_DECAY=0.9999
 MOVING_AVERAGE_DECAY =0.99
 regularizer = 0.0001
 mode_path = "./model"
@@ -20,7 +20,7 @@ def backward(mnist):
     y_ = tf.placeholder(tf.float32,shape=(None,forward.OUT_NODE))
 
     y,w1,w2 = forward.forward(x,regularizer)
-    global_step = tf.Variable(tf.constant(38000),trainable=False)
+    global_step = tf.Variable(tf.constant(0),trainable=False)
 #定义损失函数
     #loss_mse = tf.reduce_mean(tf.square(y-y_))
     #loss_total = loss_mse+tf.add_n(tf.get_collection('losses'))
@@ -47,8 +47,8 @@ def backward(mnist):
     with tf.control_dependencies([train_step,ema_op]):
         train_op = tf.no_op(name = 'train')
     
-    saver = tf.train.Saver()
-
+    saver = tf.train.Saver(max_to_keep=1)
+   
     with tf.Session() as sess:
         init_op = tf.global_variables_initializer()
         sess.run(init_op)
@@ -56,22 +56,26 @@ def backward(mnist):
         if ckpt and ckpt.model_checkpoint_path:
             saver.restore(sess,ckpt.model_checkpoint_path) 
 
-        for i in range(40000):
-            xs,ys = mnist.train.next_batch(BATCH_SIZE)
+        for i in range(40000000):
+            try:
+                xs,ys = mnist.train.next_batch(BATCH_SIZE)
 
-            #start = ((i*BATCH_SIZE)+BATCH_SIZE)%data_size
-            #end = min(start+BATCH_SIZE,data_size)
-            _,loss_value,step=sess.run([train_op,loss_total,global_step],feed_dict={x:xs ,y_:ys})
+                #start = ((i*BATCH_SIZE)+BATCH_SIZE)%data_size
+                #end = min(start+BATCH_SIZE,data_size)
+                _,loss_value,step=sess.run([train_op,loss_total,global_step],feed_dict={x:xs ,y_:ys})
 
-            if i%2000 ==0 :
-                print(str(sess.run(y,feed_dict={x:xs ,y_:ys})))
-                print("--"*20)
+                if i%2000 ==0 :
+                    #print(str(sess.run(y,feed_dict={x:xs ,y_:ys})))
+                    print("--"*20)
 
-                print("steps:"+str(step)+" 损失："+str(loss_value))
-                #保存
+                    print("steps:"+str(step)+" 损失："+str(loss_value))
+                    #保存
+                    saver.save(sess,os.path.join(mode_path,mode_name),global_step=global_step)
+            except Exception as f:
+                print("不定义捕获的异常是：%s"%f)
+            finally:
                 saver.save(sess,os.path.join(mode_path,mode_name),global_step=global_step)
-
-       
+           
               
 
 if __name__ == "__main__":
